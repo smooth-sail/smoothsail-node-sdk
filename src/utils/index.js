@@ -16,3 +16,12 @@ export const openSSEConnection = (endpoint) => {
     console.error('SSE error:', error);
   };
 }
+
+export const delay = async (time) => {
+  await new Promise(resolve => setTimeout(resolve, time));
+}
+
+export const flags = {
+  useRealUserData: false,
+  bugFixed: false,
+}
