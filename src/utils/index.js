@@ -1,5 +1,5 @@
-import 'dotenv/config';
-import EventSource from 'eventsource'
+import "dotenv/config";
+import EventSource from "eventsource";
 
 export const openSSEConnection = (endpoint) => {
   const eventSource = new EventSource(endpoint);
@@ -9,19 +9,14 @@ export const openSSEConnection = (endpoint) => {
   };
 
   eventSource.onmessage = (e) => {
-    console.log(JSON.parse(e.data))
+    console.log(JSON.parse(e.data));
   };
 
   eventSource.onerror = (error) => {
-    console.error('SSE error:', error);
+    console.error("SSE error:", error);
   };
-}
+};
 
 export const delay = async (time) => {
-  await new Promise(resolve => setTimeout(resolve, time));
-}
-
-export const flags = {
-  useRealUserData: false,
-  bugFixed: false,
-}
+  await new Promise((resolve) => setTimeout(resolve, time));
+};
