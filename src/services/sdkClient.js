@@ -5,6 +5,8 @@ import EventSource from "eventsource";
 export class SDKClient {
   constructor() {
     this.flagData = [];
+    this.fetchFeatureFlags();
+    this.openSSEConnection();
   }
 
   fetchFeatureFlags = async () => {

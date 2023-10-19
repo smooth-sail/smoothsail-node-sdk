@@ -1,14 +1,12 @@
 import { Router } from "express";
 import { delay } from "../utils";
-import { SDKClient } from "../services/flags";
+import { SDKClient } from "../services/sdkClient";
 import { fetchUsersData, fetchTestUsersData } from "../services/users";
 
 const router = Router();
 
 (async () => {
   let client = new SDKClient();
-  await client.fetchFeatureFlags();
-  client.openSSEConnection();
 
   router.get("/", async (req, res) => {
     if (client.evaluateFlag("Bug fixed")) {
