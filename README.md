@@ -2,5 +2,5 @@
 
 Set up the following environmental variables in an .env file.
 
-- PORT
-- SSE_ENDPOINT
+- PORT=<port>
+- SSE_ENDPOINT=<endpoint-url>
