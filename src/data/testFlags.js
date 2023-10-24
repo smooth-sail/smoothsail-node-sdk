@@ -37,6 +37,13 @@ const TEST_FLAGS = {
               value: 30,
               a_key: "age",
             },
+            {
+              r_key: "s10",
+              type: "string",
+              operator: "is",
+              value: "WA",
+              a_key: "state",
+            },
           ],
         },
       ],

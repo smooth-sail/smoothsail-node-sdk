@@ -5,6 +5,7 @@ const TEST_USER_CONTEXT_1 = {
   country: "USA",
   "beta-tester": true,
   age: 25,
+  state: "WA",
 };
 
 export default TEST_USER_CONTEXT_1;
