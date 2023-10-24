@@ -4,6 +4,7 @@ const TEST_USER_CONTEXT_1 = {
   email: "john_doe@coolcompany.com",
   country: "USA",
   "beta-tester": true,
+  age: 25,
 };
 
 export default TEST_USER_CONTEXT_1;

@@ -17,6 +17,13 @@ const TEST_FLAGS = {
               value: true,
               a_key: "beta-tester",
             },
+            {
+              r_key: "1abc",
+              type: "string",
+              operator: "contains",
+              value: "@gmail.com",
+              a_key: "email",
+            },
           ],
         },
         {

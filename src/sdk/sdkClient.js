@@ -24,9 +24,30 @@ export class SDKClient {
 
   evaluateFlag(flagKey, userContext) {
     const flag = this.flagData[flagKey];
-    console.log(flag);
+    const userInSegment = this.evaluateSegment(flag, userContext);
+
+    console.log("flag", flag);
+    console.log("segments", userInSegment);
     // Default to false if flag not found.
-    return flag ? flag.is_active : false;
+    return flag && flag.is_active && userInSegment;
+  }
+
+  evaluateSegment(flag, userContext) {
+    const segments = flag.segments;
+    if (!segments) {
+      return true;
+    }
+    // check if user context evals to true for any associated segment
+    for (let segment in segments) {
+      if (this.evaluateRules(segment, userContext)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  evaluateRules(segment, userContext) {
+    return true;
   }
 
   addNewFlag(flag) {
