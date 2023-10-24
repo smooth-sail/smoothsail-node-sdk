@@ -6,6 +6,13 @@ import { fetchUsersData, fetchTestUsersData } from "../services/users";
 const router = Router();
 
 let client = new SDKClient();
+let userContext = {
+  user_id: "12jdn09",
+  user_name: "John Doe",
+  email: "john_doe@coolcompany.com",
+  country: "USA",
+  "beta-tester": true,
+};
 
 router.get("/", async (req, res) => {
   if (client.evaluateFlag("Bug fixed")) {

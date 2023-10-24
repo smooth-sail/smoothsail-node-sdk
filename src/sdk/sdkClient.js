@@ -7,7 +7,7 @@ const GET_ALL_FLAGS = "http://localhost:3000/api/flags";
 
 export class SDKClient {
   constructor() {
-    this.flagData = [];
+    this.flagData = {};
     this.fetchFeatureFlags();
     this.openSSEConnection();
   }
@@ -16,37 +16,29 @@ export class SDKClient {
     try {
       // const { data } = await axios.get(GET_ALL_FLAGS);
 
-      this.flagData = [TEST_FLAGS.payload];
+      this.flagData = TEST_FLAGS.payload;
     } catch (error) {
       throw error;
     }
   }
 
-  evaluateFlag(title) {
-    const flag = this.flagData.find((flag) => flag.title === title);
+  evaluateFlag(f_key) {
+    const flag = this.flagData[f_key];
     console.log(flag);
     // Default to false if flag not found.
     return flag ? flag.is_active : false;
   }
 
   addNewFlag(flag) {
-    this.flagData.push(flag);
+    this.flagData[flag["f_key"]] = flag;
   }
 
   updateFlag(updatedFlag) {
-    this.flagData = this.flagData.map((flag) => {
-      if (flag.id === updatedFlag.id) {
-        return updatedFlag;
-      }
-
-      return flag;
-    });
+    this.flagData[updatedFlag["f_key"]] = updatedFlag;
   }
 
   deleteFlag(deletedFlag) {
-    this.flagData = this.flagData.filter((flag) => {
-      return flag.title !== deletedFlag.title;
-    });
+    delete this.flagData[deletedFlag["f_key"]];
   }
 
   openSSEConnection() {
