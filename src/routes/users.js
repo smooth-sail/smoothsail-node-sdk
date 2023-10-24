@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { delay } from "../utils";
-import { SDKClient } from "../services/sdkClient";
+import { SDKClient } from "../sdk/sdkClient";
 import { fetchUsersData, fetchTestUsersData } from "../services/users";
 
 const router = Router();
