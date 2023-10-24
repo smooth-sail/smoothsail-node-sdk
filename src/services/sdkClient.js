@@ -1,6 +1,7 @@
 import "dotenv/config";
 import axios from "axios";
 import EventSource from "eventsource";
+import TEST_FLAGS from "../data/testFlags";
 
 const GET_ALL_FLAGS = "http://localhost:3000/api/flags";
 
@@ -13,8 +14,9 @@ export class SDKClient {
 
   async fetchFeatureFlags() {
     try {
-      const { data } = await axios.get(GET_ALL_FLAGS);
-      this.flagData = data;
+      // const { data } = await axios.get(GET_ALL_FLAGS);
+
+      this.flagData = [TEST_FLAGS.payload];
     } catch (error) {
       throw error;
     }
