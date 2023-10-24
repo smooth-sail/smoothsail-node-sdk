@@ -22,8 +22,8 @@ export class SDKClient {
     }
   }
 
-  evaluateFlag(f_key) {
-    const flag = this.flagData[f_key];
+  evaluateFlag(flagKey, userContext) {
+    const flag = this.flagData[flagKey];
     console.log(flag);
     // Default to false if flag not found.
     return flag ? flag.is_active : false;
