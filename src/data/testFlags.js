@@ -34,6 +34,9 @@ const TEST_FLAGS = {
         },
       ],
     },
+    "Bug fixed": {
+      is_active: true,
+    },
   },
 };
 
