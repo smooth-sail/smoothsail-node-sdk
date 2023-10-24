@@ -24,21 +24,20 @@ export class SDKClient {
 
   evaluateFlag(flagKey, userContext) {
     const flag = this.flagData[flagKey];
-    const userInSegment = this.evaluateSegment(flag, userContext);
+    const userInSegment = this.isUserInSegment(flag, userContext);
 
-    console.log("flag", flag);
-    console.log("segments", userInSegment);
-    // Default to false if flag not found.
+    // console.log("flag", flag);
+
     return flag && flag.is_active && userInSegment;
   }
 
-  evaluateSegment(flag, userContext) {
+  isUserInSegment(flag, userContext) {
     const segments = flag.segments;
-    if (!segments) {
+    if (!segments || segments.length === 0) {
       return true;
     }
     // check if user context evals to true for any associated segment
-    for (let segment in segments) {
+    for (let segment of segments) {
       if (this.evaluateRules(segment, userContext)) {
         return true;
       }
@@ -47,7 +46,53 @@ export class SDKClient {
   }
 
   evaluateRules(segment, userContext) {
-    return true;
+    let results = false;
+    if (segment.rules_operator === "all") {
+      results = segment.rules.every((rule) => {
+        return this.isRuleTrue(rule, userContext);
+      });
+    } else if (segment.rules_operator === "any") {
+      results = segment.rules.some((rule) => {
+        return this.isRuleTrue(rule, userContext);
+      });
+    }
+    console.log(segment, "results ", results);
+    return results;
+  }
+
+  isRuleTrue(rule, userContext) {
+    console.log("rule", rule);
+    if (rule.operator === "is" || rule.operator === "=") {
+      console.log(
+        "user context",
+        userContext[rule["a_key"]],
+        "value",
+        rule["value"]
+      );
+      console.log(userContext[rule["a_key"]] === rule["value"]);
+
+      return userContext[rule["a_key"]] === rule["value"];
+    } else if (rule.operator === "is not" || rule.operator === "!=") {
+      console.log(
+        "user context",
+        userContext[rule["a_key"]],
+        "value",
+        rule["value"]
+      );
+
+      return userContext[rule["a_key"]] !== rule["value"];
+    } else if (rule.operator === "contains") {
+      const regex = new RegExp(rule["value"]);
+      console.log("regex", regex, regex.test(userContext[rule["a_key"]]));
+
+      return regex.test(userContext[rule["a_key"]]);
+    } else if (rule.operator === ">=") {
+      console.log(">= evaluated");
+      return userContext[rule["a_key"]] >= rule["value"];
+    } else if (rule.operator === "<=") {
+      return userContext[rule["a_key"]] <= rule["value"];
+    }
+    return false;
   }
 
   addNewFlag(flag) {
