@@ -56,41 +56,33 @@ export class SDKClient {
         return this.isRuleTrue(rule, userContext);
       });
     }
-    console.log(segment, "results ", results);
+
     return results;
   }
 
   isRuleTrue(rule, userContext) {
-    console.log("rule", rule);
-    if (rule.operator === "is" || rule.operator === "=") {
-      console.log(
-        "user context",
-        userContext[rule["a_key"]],
-        "value",
-        rule["value"]
-      );
-      console.log(userContext[rule["a_key"]] === rule["value"]);
+    let userAttr = userContext[rule["a_key"]];
+    let userValue = rule["value"];
+    let operator = rule.operator;
 
-      return userContext[rule["a_key"]] === rule["value"];
-    } else if (rule.operator === "is not" || rule.operator === "!=") {
-      console.log(
-        "user context",
-        userContext[rule["a_key"]],
-        "value",
-        rule["value"]
-      );
-
-      return userContext[rule["a_key"]] !== rule["value"];
-    } else if (rule.operator === "contains") {
-      const regex = new RegExp(rule["value"]);
-      console.log("regex", regex, regex.test(userContext[rule["a_key"]]));
-
-      return regex.test(userContext[rule["a_key"]]);
-    } else if (rule.operator === ">=") {
-      console.log(">= evaluated");
-      return userContext[rule["a_key"]] >= rule["value"];
-    } else if (rule.operator === "<=") {
-      return userContext[rule["a_key"]] <= rule["value"];
+    if (operator === "is" || operator === "=") {
+      return userAttr === userValue;
+    } else if (operator === "is not" || operator === "!=") {
+      return userAttr !== userValue;
+    } else if (operator === "contains") {
+      const regex = new RegExp(userValue);
+      return regex.test(userAttr);
+    } else if (operator === "does not contain") {
+      const regex = new RegExp(userValue);
+      return !regex.test(userAttr);
+    } else if (operator === ">=") {
+      return userAttr >= userValue;
+    } else if (operator === "<=") {
+      return userAttr <= userValue;
+    } else if (operator === "exists") {
+      return !!userAttr;
+    } else if (operator === "does not exist") {
+      return !userAttr;
     }
     return false;
   }
