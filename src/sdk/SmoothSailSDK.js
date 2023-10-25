@@ -8,8 +8,10 @@ const GET_ALL_FLAGS = "http://localhost:3000/api/flags";
 export class SDKClient {
   constructor() {
     this.flagData = {};
+    this.last_updated;
     this.fetchFeatureFlags();
     this.openSSEConnection();
+    this.updatedLastUpdated();
   }
 
   async fetchFeatureFlags() {
@@ -93,8 +95,81 @@ export class SDKClient {
     this.flagData[updatedFlag["f_key"]] = updatedFlag;
   }
 
-  deleteFlag(deletedFlag) {
-    delete this.flagData[deletedFlag["f_key"]];
+  deleteFlag(deletedFlagKey) {
+    delete this.flagData[deletedFlagKey];
+  }
+
+  addSegment(newSegment) {
+    this.flagData[newSegment["f_key"]]["segments"].push(newSegment["segment"]);
+  }
+
+  removeSegment(deleteSegment) {
+    let segments = this.flagData[deleteSegment["f_key"]]["segments"];
+    let newSegments = segments.filter(
+      (segment) => segment["s_key"] !== deleteSegment["s_key"]
+    );
+    this.flagData[deleteSegment["f_key"]]["segments"] = newSegments;
+  }
+
+  updateSegment() {
+    // segment body update ?
+  }
+
+  addRule(newRule) {
+    let rule = {
+      r_key: newRule["r_key"],
+      operator: newRule["operator"],
+      value: newRule["value"],
+      a_key: newRule["a_key"],
+    };
+    for (flag in this.flagData) {
+      flag.segments.forEach((segment) => {
+        if (segment.s_key === newRule["s_key"]) {
+          segment.rules.push(rule);
+        }
+      });
+    }
+  }
+
+  removeRule(removeRule) {
+    for (flag in this.flagData) {
+      flag.segments.forEach((segment) => {
+        if (segment.s_key === removeRule["s_key"]) {
+          let newRules = segment.rules.filter(
+            (rule) => rule["r_key"] !== removeRule["r_key"]
+          );
+          segment.rules = newRules;
+        }
+      });
+    }
+  }
+
+  updateSegmentRule(updatedSegmentRule) {
+    let updatedRuleForSegment = {
+      r_key: updatedSegmentRule["r_key"],
+      operator: updatedSegmentRule["operator"],
+      value: updatedSegmentRule["value"],
+      a_key: updatedSegmentRule["a_key"],
+    };
+    for (flag in this.flagData) {
+      flag.segments.forEach((segment) => {
+        if (segment.s_key === updatedSegmentRule["s_key"]) {
+          let updatedRules = segment.rules.map((rule) => {
+            if (updatedSegmentRule["r_key"] === rule["r_key"]) {
+              return updatedRuleForSegment;
+            } else {
+              return rule;
+            }
+          });
+          segment.rules = updatedRules;
+        }
+      });
+    }
+  }
+
+  updatedLastUpdated() {
+    // update the last_updated
+    // should this be to time now when SSE notification received?
   }
 
   openSSEConnection() {
@@ -111,11 +186,29 @@ export class SDKClient {
         case "new-flag":
           this.addNewFlag(notification.payload);
           break;
-        case "update":
+        case "toggle":
           this.updateFlag(notification.payload);
           break;
         case "deleted-flag":
           this.deleteFlag(notification.payload);
+          break;
+        case "segment add":
+          this.addSegment(notification.payload);
+          break;
+        case "segment remove":
+          this.removeSegment(notification.payload);
+          break;
+        case "segment body update":
+          this.updateSegment(notification.payload);
+          break;
+        case "rule add":
+          this.addRule(notification.payload);
+          break;
+        case "rule remove":
+          this.removeRule(notification.payload);
+          break;
+        case "segment update":
+          this.updateSegmentRule(notification.payload);
           break;
       }
 
