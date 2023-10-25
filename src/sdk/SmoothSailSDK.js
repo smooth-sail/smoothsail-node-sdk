@@ -59,8 +59,10 @@ export class SDKClient {
     flag.removeSegment(deleteSegment["s_key"]);
   }
 
-  updateSegment() {
-    // segment body update ?
+  updateSegmentBody(updatedSegment) {
+    for (let flag in this.flagData) {
+      flag.updateSegmentBody(updatedSegment);
+    }
   }
 
   addRule(newRule) {
@@ -113,7 +115,7 @@ export class SDKClient {
           this.removeSegment(notification.payload);
           break;
         case "segment body update":
-          this.updateSegment(notification.payload);
+          this.updateSegmentBody(notification.payload);
           break;
         case "rule add":
           this.addRule(notification.payload);
@@ -121,7 +123,7 @@ export class SDKClient {
         case "rule remove":
           this.removeRule(notification.payload);
           break;
-        case "segment update":
+        case "rule update":
           this.updateSegmentRule(notification.payload);
           break;
       }

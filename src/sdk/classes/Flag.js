@@ -86,6 +86,17 @@ export class Flag {
     this.segments = newSegments;
   }
 
+  updateSegmentBody(updatedSegment) {
+    let updatedSegments = this.segments.map((segment) => {
+      if (segment.s_key === updatedSegment.s_key) {
+        return updatedSegment;
+      } else {
+        return segment;
+      }
+    });
+    this.segments = updatedSegments;
+  }
+
   addRule(newRule) {
     let rule = {
       r_key: newRule["r_key"],
