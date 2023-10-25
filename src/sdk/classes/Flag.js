@@ -1,10 +1,17 @@
+import { Segment } from "./Segment";
+
 export class Flag {
   constructor({ f_key, is_active, created_at, updated_at, segments }) {
     this.f_key = f_key;
     this.is_active = is_active;
     this.created_at = created_at;
     this.updated_at = updated_at;
-    this.segments = segments || [];
+    this.segments = [];
+    if (segments && segments.length !== 0) {
+      segments.forEach((segment) => {
+        this.segments.push(new Segment(segment));
+      });
+    }
   }
 
   updateFlag({ f_key, is_active, created_at, updated_at, segments }) {
@@ -12,74 +19,34 @@ export class Flag {
     this.is_active = is_active;
     this.created_at = created_at;
     this.updated_at = updated_at;
-    this.segments = segments || [];
+    this.segments = [];
+    if (segments && segments.length !== 0) {
+      segments.forEach((segment) => {
+        this.segments.push(new Segment(segment));
+      });
+    }
   }
 
   evaluateFlag(userContext = {}) {
-    return this.is_active && this.isUserInSegment(userContext);
+    return this.is_active && this.isUserInASegment(userContext);
   }
 
-  isUserInSegment(userContext) {
+  isUserInASegment(userContext) {
     if (this.segments.length === 0) {
       return true;
     }
 
     // check if user context evals to true for any associated segment
-    for (let segment of this.segments) {
-      if (this.evaluateRules(segment, userContext)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  evaluateRules(segment, userContext) {
-    let results = false;
-    if (segment.rules_operator === "all") {
-      results = segment.rules.every((rule) => {
-        return this.isRuleTrue(rule, userContext);
-      });
-    } else if (segment.rules_operator === "any") {
-      results = segment.rules.some((rule) => {
-        return this.isRuleTrue(rule, userContext);
-      });
-    }
-
-    return results;
-  }
-
-  isRuleTrue(rule, userContext) {
-    let userAttr = userContext[rule["a_key"]];
-    let userValue = rule["value"];
-    let operator = rule.operator;
-
-    if (operator === "is" || operator === "=") {
-      return userAttr === userValue;
-    } else if (operator === "is not" || operator === "!=") {
-      return userAttr !== userValue;
-    } else if (operator === "contains") {
-      const regex = new RegExp(userValue);
-      return regex.test(userAttr);
-    } else if (operator === "does not contain") {
-      const regex = new RegExp(userValue);
-      return !regex.test(userAttr);
-    } else if (operator === ">=") {
-      return userAttr >= userValue;
-    } else if (operator === "<=") {
-      return userAttr <= userValue;
-    } else if (operator === "exists") {
-      return !!userAttr;
-    } else if (operator === "does not exist") {
-      return !userAttr;
-    }
-    return false;
+    return this.segments.some((segment) =>
+      segment.evaluateSegment(userContext)
+    );
   }
 
   addSegment(segment) {
-    this.segments.push(segment);
+    this.segments.push(new Segment(segment));
   }
 
-  removeSegment(segment) {
+  removeSegment(deleteSegment) {
     let newSegments = this.segments.filter(
       (segment) => segment["s_key"] !== deleteSegment["s_key"]
     );
@@ -87,26 +54,17 @@ export class Flag {
   }
 
   updateSegmentBody(updatedSegment) {
-    let updatedSegments = this.segments.map((segment) => {
+    this.segments.forEach((segment) => {
       if (segment.s_key === updatedSegment.s_key) {
-        return updatedSegment;
-      } else {
-        return segment;
+        segment.updateSegmentBody(updatedSegment);
       }
     });
-    this.segments = updatedSegments;
   }
 
   addRule(newRule) {
-    let rule = {
-      r_key: newRule["r_key"],
-      operator: newRule["operator"],
-      value: newRule["value"],
-      a_key: newRule["a_key"],
-    };
     this.segments.forEach((segment) => {
       if (segment.s_key === newRule["s_key"]) {
-        segment.rules.push(rule);
+        segment.addRule(newRule);
       }
     });
   }
@@ -114,32 +72,15 @@ export class Flag {
   removeRule(removeRule) {
     this.segments.forEach((segment) => {
       if (segment.s_key === removeRule["s_key"]) {
-        let newRules = segment.rules.filter(
-          (rule) => rule["r_key"] !== removeRule["r_key"]
-        );
-        segment.rules = newRules;
+        segment.removeRule(removeRule);
       }
     });
   }
 
   updateSegmentRule(updatedSegmentRule) {
-    let updatedRuleForSegment = {
-      r_key: updatedSegmentRule["r_key"],
-      operator: updatedSegmentRule["operator"],
-      value: updatedSegmentRule["value"],
-      a_key: updatedSegmentRule["a_key"],
-    };
-
     this.segments.forEach((segment) => {
       if (segment.s_key === updatedSegmentRule["s_key"]) {
-        let updatedRules = segment.rules.map((rule) => {
-          if (updatedSegmentRule["r_key"] === rule["r_key"]) {
-            return updatedRuleForSegment;
-          } else {
-            return rule;
-          }
-        });
-        segment.rules = updatedRules;
+        segment.updateSegmentRule(updatedSegmentRule);
       }
     });
   }

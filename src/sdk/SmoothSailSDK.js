@@ -4,7 +4,7 @@ import EventSource from "eventsource";
 import TEST_FLAGS from "../data/testFlags";
 import { Flag } from "./classes/Flag";
 
-const GET_ALL_FLAGS = "http://localhost:3000/api/flags";
+const GET_ALL_FLAGS = "http://localhost:3000/api/sdk/flags";
 
 export class SDKClient {
   constructor() {
@@ -17,13 +17,19 @@ export class SDKClient {
 
   async fetchFeatureFlags() {
     try {
-      // const { data } = await axios.get(GET_ALL_FLAGS);
-      let featureFlags = TEST_FLAGS.payload;
+      const { data } = await axios.get(GET_ALL_FLAGS);
 
-      for (let flag in featureFlags) {
-        this.flagData[flag] = new Flag(featureFlags[flag]);
-        console.log(this.flagData);
+      for (let flag in data.payload) {
+        this.flagData[flag] = new Flag(data.payload[flag]);
       }
+      console.log("data", data);
+      console.log("flag data", this.flagData);
+      // with test data
+      // let featureFlags = TEST_FLAGS.payload;
+      // for (let flag in featureFlags) {
+      //   this.flagData[flag] = new Flag(featureFlags[flag]);
+      //   console.log(this.flagData);
+      // }
     } catch (error) {
       throw error;
     }
@@ -85,6 +91,7 @@ export class SDKClient {
 
   updatedLastUpdated() {
     // update the last_updated
+    // will this be sent with the flag data or
     // should this be to time now when SSE notification received?
   }
 
