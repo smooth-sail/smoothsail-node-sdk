@@ -26,8 +26,6 @@ export class SDKClient {
     const flag = this.flagData[flagKey];
     const userInSegment = this.isUserInSegment(flag, userContext);
 
-    // console.log("flag", flag);
-
     return flag && flag.is_active && userInSegment;
   }
 
