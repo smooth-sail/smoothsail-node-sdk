@@ -17,19 +17,19 @@ export class SDKClient {
 
   async fetchFeatureFlags() {
     try {
-      const { data } = await axios.get(GET_ALL_FLAGS);
+      // const { data } = await axios.get(GET_ALL_FLAGS);
 
-      for (let flag in data.payload) {
-        this.flagData[flag] = new Flag(data.payload[flag]);
-      }
-      console.log("data", data);
-      console.log("flag data", this.flagData);
-      // with test data
-      // let featureFlags = TEST_FLAGS.payload;
-      // for (let flag in featureFlags) {
-      //   this.flagData[flag] = new Flag(featureFlags[flag]);
-      //   console.log(this.flagData);
+      // for (let flag in data.payload) {
+      //   this.flagData[flag] = new Flag(data.payload[flag]);
       // }
+      // console.log("data", data);
+      // console.log("flag data", this.flagData);
+      // with test data
+      let featureFlags = TEST_FLAGS.payload;
+      for (let flag in featureFlags) {
+        this.flagData[flag] = new Flag(featureFlags[flag]);
+        console.log(this.flagData);
+      }
     } catch (error) {
       throw error;
     }
