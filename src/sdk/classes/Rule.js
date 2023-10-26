@@ -8,27 +8,33 @@ export class Rule {
   }
 
   isTrue(userContext) {
-    let userAttr = userContext[this.a_key];
+    const userAttr = userContext[this.a_key];
+    const value = this.value;
+    let regex;
 
-    if (this.operator === "is" || this.operator === "=") {
-      return userAttr === this.value;
-    } else if (this.operator === "is not" || this.operator === "!=") {
-      return userAttr !== this.value;
-    } else if (this.operator === "contains") {
-      const regex = new RegExp(this.value);
-      return regex.test(userAttr);
-    } else if (this.operator === "does not contain") {
-      const regex = new RegExp(this.value);
-      return !regex.test(userAttr);
-    } else if (this.operator === ">=") {
-      return userAttr >= this.value;
-    } else if (this.operator === "<=") {
-      return userAttr <= this.value;
-    } else if (this.operator === "exists") {
-      return !!userAttr;
-    } else if (this.operator === "does not exist") {
-      return !userAttr;
+    switch (this.operator) {
+      case "is":
+      case "=":
+        return userAttr === value;
+      case "is not":
+      case "!=":
+        return userAttr !== value;
+      case "contains":
+        regex = new RegExp(value);
+        return regex.test(userAttr);
+      case "does not contain":
+        regex = new RegExp(value);
+        return !regex.test(userAttr);
+      case ">=":
+        return userAttr >= value;
+      case "<=":
+        return userAttr <= value;
+      case "exists":
+        return !!userAttr;
+      case "does not exist":
+        return !userAttr;
+      default:
+        return false;
     }
-    return false;
   }
 }

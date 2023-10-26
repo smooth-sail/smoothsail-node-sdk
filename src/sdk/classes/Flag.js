@@ -14,16 +14,11 @@ export class Flag {
     }
   }
 
-  updateFlag({ f_key, is_active, created_at, updated_at, segments }) {
-    if (f_key) {
-      this.f_key = f_key;
-    }
+  updateFlag({ is_active, updated_at, segments }) {
     if (is_active) {
       this.is_active = is_active;
     }
-    if (created_at) {
-      this.created_at = created_at;
-    }
+
     if (updated_at) {
       this.updated_at = updated_at;
     }
