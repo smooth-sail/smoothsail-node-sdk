@@ -2,8 +2,9 @@ import "dotenv/config";
 import axios from "axios";
 import EventSource from "eventsource";
 import TEST_FLAGS from "../data/testFlags";
+import { Flag } from "./classes/Flag";
 
-const GET_ALL_FLAGS = "http://localhost:3000/api/flags";
+const GET_ALL_FLAGS = "http://localhost:3000/api/sdk/flags";
 
 export class SDKClient {
   constructor() {
@@ -16,9 +17,18 @@ export class SDKClient {
 
   async fetchFeatureFlags() {
     try {
-      // const { data } = await axios.get(GET_ALL_FLAGS);
+      const { data } = await axios.get(GET_ALL_FLAGS);
+      for (let flag in data.payload) {
+        this.flagData[flag] = new Flag(data.payload[flag]);
+      }
+      // console.log("flag data", this.flagData);
 
-      this.flagData = TEST_FLAGS.payload;
+      // with test data
+      // let featureFlags = TEST_FLAGS.payload;
+      // for (let flag in featureFlags) {
+      //   this.flagData[flag] = new Flag(featureFlags[flag]);
+      //   console.log(this.flagData);
+      // }
     } catch (error) {
       throw error;
     }
@@ -26,73 +36,16 @@ export class SDKClient {
 
   evaluateFlag(flagKey, userContext) {
     const flag = this.flagData[flagKey];
-    const userInSegment = this.isUserInSegment(flag, userContext);
-
-    return flag && flag.is_active && userInSegment;
-  }
-
-  isUserInSegment(flag, userContext) {
-    const segments = flag.segments;
-    if (!segments || segments.length === 0) {
-      return true;
-    }
-    // check if user context evals to true for any associated segment
-    for (let segment of segments) {
-      if (this.evaluateRules(segment, userContext)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  evaluateRules(segment, userContext) {
-    let results = false;
-    if (segment.rules_operator === "all") {
-      results = segment.rules.every((rule) => {
-        return this.isRuleTrue(rule, userContext);
-      });
-    } else if (segment.rules_operator === "any") {
-      results = segment.rules.some((rule) => {
-        return this.isRuleTrue(rule, userContext);
-      });
-    }
-
-    return results;
-  }
-
-  isRuleTrue(rule, userContext) {
-    let userAttr = userContext[rule["a_key"]];
-    let userValue = rule["value"];
-    let operator = rule.operator;
-
-    if (operator === "is" || operator === "=") {
-      return userAttr === userValue;
-    } else if (operator === "is not" || operator === "!=") {
-      return userAttr !== userValue;
-    } else if (operator === "contains") {
-      const regex = new RegExp(userValue);
-      return regex.test(userAttr);
-    } else if (operator === "does not contain") {
-      const regex = new RegExp(userValue);
-      return !regex.test(userAttr);
-    } else if (operator === ">=") {
-      return userAttr >= userValue;
-    } else if (operator === "<=") {
-      return userAttr <= userValue;
-    } else if (operator === "exists") {
-      return !!userAttr;
-    } else if (operator === "does not exist") {
-      return !userAttr;
-    }
-    return false;
+    return flag && flag.evaluateFlag(userContext);
   }
 
   addNewFlag(flag) {
-    this.flagData[flag["f_key"]] = flag;
+    this.flagData[flag["f_key"]] = new Flag(flag);
   }
 
   updateFlag(updatedFlag) {
-    this.flagData[updatedFlag["f_key"]] = updatedFlag;
+    let flag = this.flagData[updatedFlag["f_key"]];
+    flag.updateFlag(updatedFlag);
   }
 
   deleteFlag(deletedFlagKey) {
@@ -100,75 +53,44 @@ export class SDKClient {
   }
 
   addSegment(newSegment) {
-    this.flagData[newSegment["f_key"]]["segments"].push(newSegment["segment"]);
+    let flagKey = newSegment["f_key"];
+    let flag = this.flagData[flagKey];
+    flag.addSegment(newSegment["segment"]);
   }
 
   removeSegment(deleteSegment) {
-    let segments = this.flagData[deleteSegment["f_key"]]["segments"];
-    let newSegments = segments.filter(
-      (segment) => segment["s_key"] !== deleteSegment["s_key"]
-    );
-    this.flagData[deleteSegment["f_key"]]["segments"] = newSegments;
+    let flagKey = deleteSegment["f_key"];
+    let flag = this.flagData[flagKey];
+    flag.removeSegment(deleteSegment["s_key"]);
   }
 
-  updateSegment() {
-    // segment body update ?
+  updateSegmentBody(updatedSegment) {
+    for (let flag in this.flagData) {
+      flag.updateSegmentBody(updatedSegment);
+    }
   }
 
   addRule(newRule) {
-    let rule = {
-      r_key: newRule["r_key"],
-      operator: newRule["operator"],
-      value: newRule["value"],
-      a_key: newRule["a_key"],
-    };
-    for (flag in this.flagData) {
-      flag.segments.forEach((segment) => {
-        if (segment.s_key === newRule["s_key"]) {
-          segment.rules.push(rule);
-        }
-      });
+    for (let flag in this.flagData) {
+      flag.addRule(newRule);
     }
   }
 
   removeRule(removeRule) {
     for (flag in this.flagData) {
-      flag.segments.forEach((segment) => {
-        if (segment.s_key === removeRule["s_key"]) {
-          let newRules = segment.rules.filter(
-            (rule) => rule["r_key"] !== removeRule["r_key"]
-          );
-          segment.rules = newRules;
-        }
-      });
+      flag.removeRule(removeRule);
     }
   }
 
   updateSegmentRule(updatedSegmentRule) {
-    let updatedRuleForSegment = {
-      r_key: updatedSegmentRule["r_key"],
-      operator: updatedSegmentRule["operator"],
-      value: updatedSegmentRule["value"],
-      a_key: updatedSegmentRule["a_key"],
-    };
-    for (flag in this.flagData) {
-      flag.segments.forEach((segment) => {
-        if (segment.s_key === updatedSegmentRule["s_key"]) {
-          let updatedRules = segment.rules.map((rule) => {
-            if (updatedSegmentRule["r_key"] === rule["r_key"]) {
-              return updatedRuleForSegment;
-            } else {
-              return rule;
-            }
-          });
-          segment.rules = updatedRules;
-        }
-      });
+    for (let flag in this.flagData) {
+      flag.updateSegmentRule(updatedSegmentRule);
     }
   }
 
   updatedLastUpdated() {
     // update the last_updated
+    // will this be sent with the flag data or
     // should this be to time now when SSE notification received?
   }
 
@@ -199,7 +121,7 @@ export class SDKClient {
           this.removeSegment(notification.payload);
           break;
         case "segment body update":
-          this.updateSegment(notification.payload);
+          this.updateSegmentBody(notification.payload);
           break;
         case "rule add":
           this.addRule(notification.payload);
@@ -207,7 +129,7 @@ export class SDKClient {
         case "rule remove":
           this.removeRule(notification.payload);
           break;
-        case "segment update":
+        case "rule update":
           this.updateSegmentRule(notification.payload);
           break;
       }
