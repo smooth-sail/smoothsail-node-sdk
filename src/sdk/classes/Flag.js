@@ -15,15 +15,26 @@ export class Flag {
   }
 
   updateFlag({ f_key, is_active, created_at, updated_at, segments }) {
-    this.f_key = f_key;
-    this.is_active = is_active;
-    this.created_at = created_at;
-    this.updated_at = updated_at;
-    this.segments = [];
-    if (segments && segments.length !== 0) {
-      segments.forEach((segment) => {
-        this.segments.push(new Segment(segment));
-      });
+    if (f_key) {
+      this.f_key = f_key;
+    }
+    if (is_active) {
+      this.is_active = is_active;
+    }
+    if (created_at) {
+      this.created_at = created_at;
+    }
+    if (updated_at) {
+      this.updated_at = updated_at;
+    }
+
+    if (segments) {
+      this.segments = [];
+      if (segments.length !== 0) {
+        segments.forEach((segment) => {
+          this.segments.push(new Segment(segment));
+        });
+      }
     }
   }
 
