@@ -103,6 +103,7 @@ export class SDKClient {
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
+      console.log(notification);
 
       switch (notification.type) {
         case "new-flag":
@@ -134,7 +135,7 @@ export class SDKClient {
           break;
       }
 
-      console.log(this.flagData);
+      // console.log(this.flagData);
     };
 
     eventSource.onerror = (error) => {
