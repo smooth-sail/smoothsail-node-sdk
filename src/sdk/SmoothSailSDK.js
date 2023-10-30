@@ -4,7 +4,7 @@ import EventSource from "eventsource";
 import TEST_FLAGS from "../data/testFlags";
 import { Flag } from "./classes/Flag";
 
-const GET_ALL_FLAGS = "http://localhost:3000/api/sdk/flags";
+const GET_ALL_FLAGS = "http://localhost:3001/api/flags";
 
 export class SDKClient {
   constructor() {
@@ -44,55 +44,6 @@ export class SDKClient {
   evaluateFlag(flagKey, userContext) {
     const flag = this.flagData[flagKey];
     return flag && flag.evaluateFlag(userContext);
-  }
-
-  addNewFlag(flag) {
-    this.flagData[flag["f_key"]] = new Flag(flag);
-  }
-
-  updateFlag(updatedFlag) {
-    let flag = this.flagData[updatedFlag["f_key"]];
-    flag.updateFlag(updatedFlag);
-  }
-
-  deleteFlag(deletedFlagKey) {
-    delete this.flagData[deletedFlagKey];
-  }
-
-  addSegment(newSegment) {
-    let flagKey = newSegment["f_key"];
-    let flag = this.flagData[flagKey];
-    flag.addSegment(newSegment["segment"]);
-  }
-
-  removeSegment(deleteSegment) {
-    let flagKey = deleteSegment["f_key"];
-    let flag = this.flagData[flagKey];
-    flag.removeSegment(deleteSegment["s_key"]);
-  }
-
-  updateSegmentBody(updatedSegment) {
-    for (let flag in this.flagData) {
-      flag.updateSegmentBody(updatedSegment);
-    }
-  }
-
-  addRule(newRule) {
-    for (let flag in this.flagData) {
-      flag.addRule(newRule);
-    }
-  }
-
-  removeRule(removeRule) {
-    for (flag in this.flagData) {
-      flag.removeRule(removeRule);
-    }
-  }
-
-  updateSegmentRule(updatedSegmentRule) {
-    for (let flag in this.flagData) {
-      flag.updateSegmentRule(updatedSegmentRule);
-    }
   }
 
   updatedLastUpdated() {
