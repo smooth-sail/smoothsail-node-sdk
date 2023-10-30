@@ -1,7 +1,7 @@
 import "dotenv/config";
 import axios from "axios";
 import EventSource from "eventsource";
-import TEST_FLAGS from "../data/testFlags";
+// import { TEST_FLAG_1 } from "../data/testFlags";
 import { Flag } from "./classes/Flag";
 
 const GET_ALL_FLAGS = "http://localhost:3001/api/flags";
@@ -22,11 +22,7 @@ export class SDKClient {
       console.log("flag data", this.flagData);
 
       // with test data
-      // let featureFlags = TEST_FLAGS.payload;
-      // for (let flag in featureFlags) {
-      //   this.flagData[flag] = new Flag(featureFlags[flag]);
-      //   console.log(this.flagData);
-      // }
+      // this.setFlags(TEST_FLAG_1.payload);
     } catch (error) {
       throw error;
     }
@@ -41,8 +37,6 @@ export class SDKClient {
 
   evaluateFlag(flagKey, userContext) {
     const flag = this.flagData[flagKey];
-    // console.log(this.flagData);
-    // console.log("flag evaluated ", this.flagData, flagKey);
     return flag && flag.evaluateFlag(userContext);
   }
 

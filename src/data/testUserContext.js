@@ -38,6 +38,16 @@ export const TEST_USER_CONTEXT_4 = {
   state: "WA",
 };
 
+export const TEST_USER_CONTEXT_5 = {
+  user_id: "12jdn09",
+  user_name: "John Doe",
+  email: "john_doe@coolcompany.com",
+  country: "USA",
+  "beta-tester": true,
+  age: 25,
+  state: "WA",
+};
+
 export const TEST_USER_CONTEXT_6 = {
   user_id: "12jdn09",
   user_name: "John Doe",

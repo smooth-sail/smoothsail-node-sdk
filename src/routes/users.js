@@ -2,7 +2,7 @@ import { Router } from "express";
 import { delay } from "../utils";
 import { SDKClient } from "../sdk/SmoothSailSDK";
 import { fetchUsersData, fetchTestUsersData } from "../services/users";
-import TEST_USER_CONTEXT_1 from "../data/testUserContext";
+import { TEST_USER_CONTEXT_1 } from "../data/testUserContext";
 
 const router = Router();
 
