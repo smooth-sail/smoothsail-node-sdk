@@ -18,8 +18,8 @@ export class SDKClient {
   async fetchFeatureFlags() {
     try {
       const { data } = await axios.get(GET_ALL_FLAGS);
-      this.setFlags(data);
-      // console.log("flag data", this.flagData);
+      this.setFlags(data.payload);
+      console.log("flag data", this.flagData);
 
       // with test data
       // let featureFlags = TEST_FLAGS.payload;
@@ -34,8 +34,8 @@ export class SDKClient {
 
   setFlags(flags) {
     this.flagData = {};
-    for (let flag in data) {
-      this.flagData[flag] = new Flag(data[flag]);
+    for (let flag in flags) {
+      this.flagData[flag] = new Flag(flags[flag]);
     }
   }
 
