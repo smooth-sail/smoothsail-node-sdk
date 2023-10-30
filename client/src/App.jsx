@@ -7,7 +7,7 @@ function App() {
 
   useEffect(() => {
     const fetchUserRows = async () => {
-      const { data } = await axios.get("http://localhost:3001/users");
+      const { data } = await axios.get("http://localhost:3005/users");
       setRows(data);
     };
     fetchUserRows();

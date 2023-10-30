@@ -41,6 +41,8 @@ export class SDKClient {
 
   evaluateFlag(flagKey, userContext) {
     const flag = this.flagData[flagKey];
+    // console.log(this.flagData);
+    // console.log("flag evaluated ", this.flagData, flagKey);
     return flag && flag.evaluateFlag(userContext);
   }
 
@@ -59,8 +61,11 @@ export class SDKClient {
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
-      console.log(notification);
-      this.setFlags(notification);
+
+      if (notification.type === "flags") {
+        console.log(notification);
+        this.setFlags(notification);
+      }
     };
 
     eventSource.onerror = (error) => {
