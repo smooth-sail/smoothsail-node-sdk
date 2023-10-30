@@ -34,6 +34,13 @@ export class SDKClient {
     }
   }
 
+  setFlags(flags) {
+    this.flagData = {};
+    for (let flag in data.payload) {
+      this.flagData[flag] = new Flag(data.payload[flag]);
+    }
+  }
+
   evaluateFlag(flagKey, userContext) {
     const flag = this.flagData[flagKey];
     return flag && flag.evaluateFlag(userContext);
@@ -104,38 +111,7 @@ export class SDKClient {
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
       console.log(notification);
-
-      switch (notification.type) {
-        case "new-flag":
-          this.addNewFlag(notification.payload);
-          break;
-        case "toggle":
-          this.updateFlag(notification.payload);
-          break;
-        case "deleted-flag":
-          this.deleteFlag(notification.payload);
-          break;
-        case "segment add":
-          this.addSegment(notification.payload);
-          break;
-        case "segment remove":
-          this.removeSegment(notification.payload);
-          break;
-        case "segment body update":
-          this.updateSegmentBody(notification.payload);
-          break;
-        case "rule add":
-          this.addRule(notification.payload);
-          break;
-        case "rule remove":
-          this.removeRule(notification.payload);
-          break;
-        case "rule update":
-          this.updateSegmentRule(notification.payload);
-          break;
-      }
-
-      // console.log(this.flagData);
+      this.setFlags(notification);
     };
 
     eventSource.onerror = (error) => {
