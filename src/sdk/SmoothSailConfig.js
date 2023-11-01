@@ -12,7 +12,7 @@ export class SmoothSailConfig {
     const client = new SmoothSailClient(this);
     try {
       await client.fetchFeatureFlags();
-      await client.openSSEConnection();
+      client.openSSEConnection();
       return client;
     } catch (error) {
       console.log("SmoothSail Server Client: connection failed");
