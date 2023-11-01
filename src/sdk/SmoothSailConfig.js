@@ -1,11 +1,11 @@
 import { SmoothSailClient } from "./SmoothSailClient";
 
 export class SmoothSailConfig {
-  constructor(sdkKey, bearerAddress) {
+  constructor(sdkKey, serverAddress) {
     this.sdkKey = sdkKey;
     // could we authenticate here?
-    this.bearerAddress = bearerAddress;
-    this.devAddress = "http://localhost:3001/api/flags";
+    this.serverAddress = serverAddress;
+    this.developmentAddress = "http://localhost:3001/api/flags";
   }
 
   async connect() {

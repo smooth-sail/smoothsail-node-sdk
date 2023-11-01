@@ -19,7 +19,7 @@ export class SmoothSailClient {
       // const headers = {
       //   headers: { Authorization: this.config.sdkKey },
       // };
-      const response = await fetch(this.config.devAddress);
+      const response = await fetch(this.config.developmentAddress);
       const data = await response.json();
       this.setFlags(data.payload);
       console.log("flag data", this.flagData);
