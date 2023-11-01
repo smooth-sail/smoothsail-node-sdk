@@ -1,10 +1,9 @@
 import { Segment } from "./Segment";
 
 export class Flag {
-  constructor({ fKey, isActive, createdAt, updatedAt, segments }) {
+  constructor({ fKey, isActive, updatedAt, segments }) {
     this.fKey = fKey;
     this.isActive = isActive;
-    this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.segments = [];
     if (segments && segments.length !== 0) {
