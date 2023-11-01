@@ -1,5 +1,4 @@
 import "dotenv/config";
-import axios from "axios";
 import EventSource from "eventsource";
 // import { TEST_FLAG_1 } from "../data/testFlags";
 import { Flag } from "./classes/Flag";
@@ -17,7 +16,8 @@ export class SDKClient {
 
   async fetchFeatureFlags() {
     try {
-      const { data } = await axios.get(GET_ALL_FLAGS);
+      const response = await fetch(GET_ALL_FLAGS);
+      const data = await response.json();
       this.setFlags(data.payload);
       console.log("flag data", this.flagData);
 
@@ -41,9 +41,7 @@ export class SDKClient {
   }
 
   updatedLastUpdated() {
-    // update the last_updated
-    // will this be sent with the flag data or
-    // should this be to time now when SSE notification received?
+    // is this still needed?
   }
 
   openSSEConnection() {
