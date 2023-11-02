@@ -9,22 +9,6 @@ export class SmoothSailClient {
     this.config = config;
   }
 
-  async fetchFeatureFlags() {
-    try {
-      const response = await fetch(this.config.developmentAddress, {
-        // headers: new Headers({
-        //   "ngrok-skip-browser-warning": "485737",
-        // }),
-      });
-      const data = await response.json();
-      this.setFlags(data.payload);
-      console.log("flag data", this.flagData);
-    } catch (error) {
-      // double check
-      throw error;
-    }
-  }
-
   setFlags(flags) {
     this.flagData = {};
     for (let flag in flags) {

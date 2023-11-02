@@ -4,13 +4,11 @@ export class SmoothSailConfig {
   constructor(sdkKey, serverAddress) {
     this.sdkKey = sdkKey;
     this.serverAddress = serverAddress;
-    this.developmentAddress = "http://localhost:3001/api/flags";
   }
 
   async connect() {
     const client = new SmoothSailClient(this);
     try {
-      // await client.fetchFeatureFlags();
       client.openSSEConnection();
       return client;
     } catch (error) {
