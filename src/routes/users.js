@@ -1,6 +1,4 @@
 import { Router } from "express";
-import { delay } from "../utils";
-import { SmoothSailClient } from "../sdk/SmoothSailClient";
 import { fetchUsersData, fetchTestUsersData } from "../services/users";
 import { TEST_USER_CONTEXT_1 } from "../data/testUserContext";
 import { SmoothSailConfig } from "../sdk/SmoothSailConfig";

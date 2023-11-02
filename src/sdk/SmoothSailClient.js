@@ -1,6 +1,5 @@
 import "dotenv/config";
 import EventSource from "eventsource";
-// import { TEST_FLAG_1 } from "../data/testFlags";
 import { Flag } from "./classes/Flag";
 
 export class SmoothSailClient {
@@ -33,15 +32,26 @@ export class SmoothSailClient {
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
-
+      console.log(notification);
       if (notification.type === "flags") {
         console.log(notification);
         this.setFlags(notification);
+      } else if (notification.type === "close") {
+        eventSource.close();
       }
     };
 
     eventSource.onerror = (error) => {
+      console.log(eventSource.readyState);
       console.error("SSE error:", error);
+
+      if (error.status === 401) {
+        console.log("get outta here");
+      }
     };
+
+    // eventSource.addEventListener("close", () => {
+    //   eventSource.close();
+    // });
   }
 }
