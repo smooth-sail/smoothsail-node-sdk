@@ -6,6 +6,7 @@ export class SmoothSailClient {
   constructor(config) {
     this.flagData = {};
     this.config = config;
+    this.SSEconnected = false;
   }
 
   setFlags(flags) {
@@ -15,9 +16,13 @@ export class SmoothSailClient {
     }
   }
 
-  evaluateFlag(flagKey, userContext) {
+  evaluateFlag(flagKey, userContext, defaultValue = false) {
     const flag = this.flagData[flagKey];
-    return flag && flag.evaluateFlag(userContext);
+    if (this.SSEconnected) {
+      return flag && flag.evaluateFlag(userContext);
+    } else {
+      return defaultValue;
+    }
   }
 
   openSSEConnection() {
@@ -28,13 +33,14 @@ export class SmoothSailClient {
 
     eventSource.onopen = () => {
       console.log(`connection to ${process.env.SSE_ENDPOINT} opened!`);
+      this.SSEconnected = true;
     };
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
       console.log(notification);
+
       if (notification.type === "flags") {
-        console.log(notification);
         this.setFlags(notification);
       } else if (notification.type === "close") {
         eventSource.close();
@@ -42,12 +48,13 @@ export class SmoothSailClient {
     };
 
     eventSource.onerror = (error) => {
-      console.log(eventSource.readyState);
       console.error("SSE error:", error);
 
       if (error.status === 401) {
         console.log("get outta here");
       }
+
+      this.SSEconnected = false;
     };
 
     // eventSource.addEventListener("close", () => {
