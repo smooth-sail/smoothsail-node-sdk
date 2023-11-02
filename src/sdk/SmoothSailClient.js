@@ -7,26 +7,20 @@ export class SmoothSailClient {
   constructor(config) {
     this.flagData = {};
     this.config = config;
-
-    // needed?
-    // this.last_updated;
-    // this.updatedLastUpdated();
   }
 
   async fetchFeatureFlags() {
     try {
-      // can pass in with initial headers
-      // const headers = {
-      //   headers: { Authorization: this.config.sdkKey },
-      // };
-      const response = await fetch(this.config.developmentAddress);
+      const response = await fetch(this.config.developmentAddress, {
+        // headers: new Headers({
+        //   "ngrok-skip-browser-warning": "485737",
+        // }),
+      });
       const data = await response.json();
       this.setFlags(data.payload);
       console.log("flag data", this.flagData);
-
-      // with test data
-      // this.setFlags(TEST_FLAG_1.payload);
     } catch (error) {
+      // double check
       throw error;
     }
   }
@@ -43,14 +37,11 @@ export class SmoothSailClient {
     return flag && flag.evaluateFlag(userContext);
   }
 
-  updatedLastUpdated() {
-    // is this still needed?
-  }
-
   openSSEConnection() {
-    // sdkKey can be used as query parameter for eventsource?
     // sdkKey used as event type?
-    const eventSource = new EventSource(process.env.SSE_ENDPOINT);
+    const eventSource = new EventSource(
+      `${this.config.serverAddress}?key=${this.config.sdkKey}`
+    );
 
     eventSource.onopen = () => {
       console.log(`connection to ${process.env.SSE_ENDPOINT} opened!`);
