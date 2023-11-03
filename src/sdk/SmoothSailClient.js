@@ -43,8 +43,6 @@ export class SmoothSailClient {
 
       if (notification.type === "flags") {
         this.setFlags(notification);
-      } else if (notification.type === "close") {
-        eventSource.close();
       }
     };
 
