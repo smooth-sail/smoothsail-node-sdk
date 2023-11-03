@@ -27,7 +27,12 @@ export class SmoothSailClient {
 
   openSSEConnection() {
     const eventSource = new EventSource(
-      `${this.config.serverAddress}?key=${this.config.sdkKey}`
+      `${this.config.serverAddress}?key=${this.config.sdkKey}`,
+      {
+        headers: {
+          Authorization: `${this.config.sdkKey}`,
+        },
+      }
     );
 
     eventSource.onopen = () => {
