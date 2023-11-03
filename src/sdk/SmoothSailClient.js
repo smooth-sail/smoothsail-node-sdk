@@ -26,7 +26,6 @@ export class SmoothSailClient {
   }
 
   openSSEConnection() {
-    // sdkKey used as event type?
     const eventSource = new EventSource(
       `${this.config.serverAddress}?key=${this.config.sdkKey}`
     );
@@ -56,9 +55,5 @@ export class SmoothSailClient {
 
       this.SSEconnected = false;
     };
-
-    // eventSource.addEventListener("close", () => {
-    //   eventSource.close();
-    // });
   }
 }
