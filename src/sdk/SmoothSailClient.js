@@ -26,14 +26,11 @@ export class SmoothSailClient {
   }
 
   openSSEConnection() {
-    const eventSource = new EventSource(
-      `${this.config.serverAddress}?key=${this.config.sdkKey}`,
-      {
-        headers: {
-          Authorization: `${this.config.sdkKey}`,
-        },
-      }
-    );
+    const eventSource = new EventSource(`${this.config.serverAddress}`, {
+      headers: {
+        Authorization: `${this.config.sdkKey}`,
+      },
+    });
 
     eventSource.onopen = () => {
       console.log(`connection to ${process.env.SSE_ENDPOINT} opened!`);
