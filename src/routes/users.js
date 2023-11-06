@@ -1,6 +1,4 @@
 import { Router } from "express";
-import { delay } from "../utils";
-import { SmoothSailClient } from "../sdk/SmoothSailClient";
 import { fetchUsersData, fetchTestUsersData } from "../services/users";
 import { TEST_USER_CONTEXT_1 } from "../data/testUserContext";
 import { SmoothSailConfig } from "../sdk/SmoothSailConfig";
@@ -8,7 +6,11 @@ import { SmoothSailConfig } from "../sdk/SmoothSailConfig";
 const router = Router();
 
 let client;
-const config = new SmoothSailConfig("important SDK key", "bearer address");
+const config = new SmoothSailConfig(
+  process.env.SDK_KEY,
+  process.env.IV,
+  process.env.SSE_ENDPOINT
+);
 
 (async () => {
   client = await config.connect();

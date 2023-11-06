@@ -1,34 +1,12 @@
 import "dotenv/config";
 import EventSource from "eventsource";
-// import { TEST_FLAG_1 } from "../data/testFlags";
 import { Flag } from "./classes/Flag";
 
 export class SmoothSailClient {
   constructor(config) {
     this.flagData = {};
     this.config = config;
-
-    // needed?
-    // this.last_updated;
-    // this.updatedLastUpdated();
-  }
-
-  async fetchFeatureFlags() {
-    try {
-      // can pass in with initial headers
-      // const headers = {
-      //   headers: { Authorization: this.config.sdkKey },
-      // };
-      const response = await fetch(this.config.developmentAddress);
-      const data = await response.json();
-      this.setFlags(data.payload);
-      console.log("flag data", this.flagData);
-
-      // with test data
-      // this.setFlags(TEST_FLAG_1.payload);
-    } catch (error) {
-      throw error;
-    }
+    this.SSEconnected = false;
   }
 
   setFlags(flags) {
@@ -38,35 +16,58 @@ export class SmoothSailClient {
     }
   }
 
-  evaluateFlag(flagKey, userContext) {
+  evaluateFlag(flagKey, userContext, defaultValue = false) {
     const flag = this.flagData[flagKey];
-    return flag && flag.evaluateFlag(userContext);
-  }
-
-  updatedLastUpdated() {
-    // is this still needed?
+    if (this.SSEconnected) {
+      return flag && flag.evaluateFlag(userContext);
+    } else {
+      return defaultValue;
+    }
   }
 
   openSSEConnection() {
-    // sdkKey can be used as query parameter for eventsource?
-    // sdkKey used as event type?
-    const eventSource = new EventSource(process.env.SSE_ENDPOINT);
+    let heartBeatInterval;
+    const eventSource = new EventSource(`${this.config.serverAddress}`, {
+      headers: {
+        Authorization: `${this.config.sdkKey}`,
+      },
+    });
 
     eventSource.onopen = () => {
       console.log(`connection to ${process.env.SSE_ENDPOINT} opened!`);
+      this.SSEconnected = true;
+      heartBeatInterval = setTimeout(() => {
+        eventSource.close();
+        this.openSSEConnection();
+      }, 15000);
     };
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
+      console.log(notification);
 
       if (notification.type === "flags") {
-        console.log(notification);
         this.setFlags(notification);
+      } else if (notification.type === "heartbeat") {
+        clearTimeout(heartBeatInterval);
+        heartBeatInterval = setTimeout(() => {
+          eventSource.close();
+          this.openSSEConnection();
+        }, 15000);
       }
     };
 
     eventSource.onerror = (error) => {
       console.error("SSE error:", error);
+
+      if (error.status === 401) {
+        console.log("get outta here");
+      } else {
+        eventSource.close();
+        this.openSSEConnection();
+      }
+
+      this.SSEconnected = false;
     };
   }
 }
