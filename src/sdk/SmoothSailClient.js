@@ -41,7 +41,6 @@ export class SmoothSailClient {
   resetSSEConnection(connection) {
     clearTimeout(this.heartBeatCheck);
     connection.close();
-    this.attempts = 0;
     this.openSSEConnection();
   }
 
@@ -53,15 +52,12 @@ export class SmoothSailClient {
     });
 
     eventSource.onopen = () => {
-      console.log(`Connection to ${process.env.SSE_ENDPOINT} opened!`);
       this.SSEconnected = true;
-      this.attempts = 0;
       this.resetHeartBeatCheckForConnection(eventSource);
     };
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
-      console.log(notification);
 
       switch (notification.type) {
         case "flags":
