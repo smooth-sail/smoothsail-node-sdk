@@ -7,6 +7,8 @@ export class SmoothSailClient {
     this.flagData = {};
     this.config = config;
     this.SSEconnected = false;
+    this.heartBeatCheck;
+    this.timeDurationCheck = 15000;
   }
 
   setFlags(flags) {
@@ -26,18 +28,20 @@ export class SmoothSailClient {
   }
 
   resetSSEConnection(connection) {
+    clearTimeout(this.heartBeatCheck);
     connection.close();
     this.openSSEConnection();
   }
 
-  startHeartBeatInterval(connection, timeDuration) {
-    return setTimeout(() => {
+  resetHeartBeatCheckForConnection(connection) {
+    clearTimeout(this.heartBeatCheck);
+
+    this.heartBeatCheck = setTimeout(() => {
       this.resetSSEConnection(connection);
-    }, timeDuration);
+    }, this.timeDurationCheck);
   }
 
   openSSEConnection() {
-    let heartBeatInterval;
     const eventSource = new EventSource(`${this.config.serverAddress}`, {
       headers: {
         Authorization: `${this.config.sdkKey}`,
@@ -47,7 +51,7 @@ export class SmoothSailClient {
     eventSource.onopen = () => {
       console.log(`Connection to ${process.env.SSE_ENDPOINT} opened!`);
       this.SSEconnected = true;
-      heartBeatInterval = this.startHeartBeatInterval(eventSource, 15000);
+      this.resetHeartBeatCheckForConnection(eventSource);
     };
 
     eventSource.onmessage = (e) => {
@@ -59,8 +63,7 @@ export class SmoothSailClient {
           this.setFlags(notification.payload);
           break;
         case "heartbeat":
-          clearTimeout(heartBeatInterval);
-          heartBeatInterval = this.startHeartBeatInterval(eventSource, 15000);
+          this.resetHeartBeatCheckForConnection(eventSource);
           break;
       }
     };
