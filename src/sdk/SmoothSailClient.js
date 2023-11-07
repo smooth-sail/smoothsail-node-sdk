@@ -25,6 +25,17 @@ export class SmoothSailClient {
     }
   }
 
+  resetSSEConnection(connection) {
+    connection.close();
+    this.openSSEConnection();
+  }
+
+  startHeartBeatInterval(connection, timeDuration) {
+    return setTimeout(() => {
+      this.resetSSEConnection(connection);
+    }, timeDuration);
+  }
+
   openSSEConnection() {
     let heartBeatInterval;
     const eventSource = new EventSource(`${this.config.serverAddress}`, {
@@ -34,40 +45,35 @@ export class SmoothSailClient {
     });
 
     eventSource.onopen = () => {
-      console.log(`connection to ${process.env.SSE_ENDPOINT} opened!`);
+      console.log(`Connection to ${process.env.SSE_ENDPOINT} opened!`);
       this.SSEconnected = true;
-      heartBeatInterval = setTimeout(() => {
-        eventSource.close();
-        this.openSSEConnection();
-      }, 15000);
+      heartBeatInterval = this.startHeartBeatInterval(eventSource, 15000);
     };
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
       console.log(notification);
 
-      if (notification.type === "flags") {
-        this.setFlags(notification.payload);
-      } else if (notification.type === "heartbeat") {
-        clearTimeout(heartBeatInterval);
-        heartBeatInterval = setTimeout(() => {
-          eventSource.close();
-          this.openSSEConnection();
-        }, 15000);
+      switch (notification.type) {
+        case "flags":
+          this.setFlags(notification.payload);
+          break;
+        case "heartbeat":
+          clearTimeout(heartBeatInterval);
+          heartBeatInterval = this.startHeartBeatInterval(eventSource, 15000);
+          break;
       }
     };
 
     eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
+      this.SSEconnected = false;
 
       if (error.status === 401) {
-        console.log("get outta here");
+        console.error("Invalid Credentials");
       } else {
-        eventSource.close();
-        this.openSSEConnection();
+        console.error("Attempting reconnection. SSE Error: ", error);
+        this.resetSSEConnection(eventSource);
       }
-
-      this.SSEconnected = false;
     };
   }
 }
