@@ -47,7 +47,7 @@ export class SmoothSailClient {
       console.log(notification);
 
       if (notification.type === "flags") {
-        this.setFlags(notification);
+        this.setFlags(notification.payload);
       } else if (notification.type === "heartbeat") {
         clearTimeout(heartBeatInterval);
         heartBeatInterval = setTimeout(() => {
