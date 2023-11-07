@@ -27,18 +27,18 @@ export class SmoothSailClient {
     }
   }
 
-  resetSSEConnection(connection) {
-    clearTimeout(this.heartBeatCheck);
-    connection.close();
-    this.openSSEConnection();
-  }
-
   resetHeartBeatCheckForConnection(connection) {
     clearTimeout(this.heartBeatCheck);
 
     this.heartBeatCheck = setTimeout(() => {
       this.resetSSEConnection(connection);
     }, this.timeDurationCheck);
+  }
+
+  resetSSEConnection(connection) {
+    clearTimeout(this.heartBeatCheck);
+    connection.close();
+    this.openSSEConnection();
   }
 
   openSSEConnection() {

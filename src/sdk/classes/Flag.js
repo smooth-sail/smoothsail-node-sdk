@@ -1,10 +1,9 @@
 import { Segment } from "./Segment";
 
 export class Flag {
-  constructor({ fKey, isActive, updatedAt, segments }) {
+  constructor({ fKey, isActive, segments }) {
     this.fKey = fKey;
     this.isActive = isActive;
-    this.updatedAt = updatedAt;
     this.segments = [];
     if (segments && segments.length !== 0) {
       segments.forEach((segment) => {
@@ -22,7 +21,6 @@ export class Flag {
       return true;
     }
 
-    // check if user context evals to true for any associated segment
     return this.segments.some((segment) =>
       segment.evaluateSegment(userContext)
     );
