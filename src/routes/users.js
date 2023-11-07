@@ -8,8 +8,7 @@ const router = Router();
 let client;
 const config = new SmoothSailConfig(
   process.env.SDK_KEY,
-  process.env.SSE_ENDPOINT,
-  10
+  process.env.SSE_ENDPOINT
 );
 
 (async () => {

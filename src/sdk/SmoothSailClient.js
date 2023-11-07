@@ -9,8 +9,6 @@ export class SmoothSailClient {
     this.SSEconnected = false;
     this.heartBeatCheck;
     this.timeDurationCheck = 15000;
-    this.attempts = 0;
-    this.maxAttempts = this.config.maxConnectionAttempts;
   }
 
   setFlags(flags) {
@@ -33,6 +31,9 @@ export class SmoothSailClient {
     clearTimeout(this.heartBeatCheck);
 
     this.heartBeatCheck = setTimeout(() => {
+      console.error(
+        "SmoothSail Server Client: Connection failed. Reopening SSE Connection."
+      );
       this.resetSSEConnection(connection);
     }, this.timeDurationCheck);
   }
@@ -78,14 +79,11 @@ export class SmoothSailClient {
       if (error.status === 401) {
         console.error("Invalid Credentials. Cannot establish connection.");
         eventSource.close();
-      } else if (this.attempts < this.maxAttempts) {
-        console.error("SSE Error: ", error, " Attempting reconnection..");
-        this.attempts++;
+      } else if (error.status === 404) {
+        console.error("Invalid Server Address. Cannot establish connection.");
+        eventSource.close();
       } else {
-        console.error(
-          "SmoothSail Server Client: Connection failed. Reopening SSE Connection."
-        );
-        this.resetSSEConnection(eventSource);
+        console.error("SSE Error: ", error, " Attempting reconnection.");
       }
     };
   }

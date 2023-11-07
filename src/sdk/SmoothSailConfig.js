@@ -2,10 +2,9 @@ import { SmoothSailClient } from "./SmoothSailClient";
 import crypto from "crypto";
 
 export class SmoothSailConfig {
-  constructor(sdkKey, serverAddress, maxConnectionAttempts) {
+  constructor(sdkKey, serverAddress) {
     this.sdkKey = this.parseAndEncryptSDK(sdkKey);
     this.serverAddress = serverAddress;
-    this.maxConnectionAttempts = maxConnectionAttempts;
   }
 
   async connect() {
