@@ -2,12 +2,10 @@ import { SmoothSailClient } from "./SmoothSailClient";
 import crypto from "crypto";
 
 export class SmoothSailConfig {
-  constructor(sdkKey, serverAddress) {
-    this.sdkKey = this.encryptSdk(
-      this.parseSdkKey(sdkKey),
-      this.parseIV(sdkKey)
-    );
+  constructor(sdkKey, serverAddress, maxConnectionAttempts) {
+    this.sdkKey = this.parseAndEncryptSDK(sdkKey);
     this.serverAddress = serverAddress;
+    this.maxConnectionAttempts = maxConnectionAttempts;
   }
 
   async connect() {
@@ -16,8 +14,18 @@ export class SmoothSailConfig {
       client.openSSEConnection();
       return client;
     } catch (error) {
-      console.log("SmoothSail Server Client: connection failed");
+      console.log("SmoothSail Server Client: Connection failed.");
       return client;
+    }
+  }
+
+  parseAndEncryptSDK(key) {
+    try {
+      let sdkKey = this.parseSdkKey(key);
+      let iv = this.parseIV(key);
+      return this.encryptSdk(sdkKey, iv);
+    } catch (error) {
+      console.log("Invalid Credentials. Check SmoothSail App for SDK Key.");
     }
   }
 
