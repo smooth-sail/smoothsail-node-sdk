@@ -2,8 +2,11 @@ import { SmoothSailClient } from "./SmoothSailClient";
 import crypto from "crypto";
 
 export class SmoothSailConfig {
-  constructor(sdkKey, iv, serverAddress) {
-    this.sdkKey = this.encryptSdk(sdkKey, iv);
+  constructor(sdkKey, serverAddress) {
+    this.sdkKey = this.encryptSdk(
+      this.parseSdkKey(sdkKey),
+      this.parseIV(sdkKey)
+    );
     this.serverAddress = serverAddress;
   }
 
@@ -32,5 +35,13 @@ export class SmoothSailConfig {
     let encryptedString = cipher.update(key, "utf8", "hex");
     encryptedString += cipher.final("hex");
     return encryptedString;
+  }
+
+  parseSdkKey(inputKey) {
+    return inputKey.split(":")[1];
+  }
+
+  parseIV(inputKey) {
+    return inputKey.split(":")[0];
   }
 }

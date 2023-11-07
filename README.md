@@ -4,6 +4,9 @@ Set up the following environmental variables in an .env file.
 
 - PORT=<port>
 - SSE_ENDPOINT=<endpoint-url>
+- SDK_KEY=<sdk-key>
+- IV=<initialVector>
+- SECRET_KEY=<secret>
 
 ### Instructions for initializing a SDK
 
