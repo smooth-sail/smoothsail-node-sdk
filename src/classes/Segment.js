@@ -1,6 +1,6 @@
-const Rule = require("./Rule");
+import { Rule } from "./Rule";
 
-class Segment {
+export class Segment {
   constructor({ sKey, rulesOperator, rules }) {
     this.sKey = sKey;
     this.rulesOperator = rulesOperator;
@@ -26,5 +26,3 @@ class Segment {
     return false;
   }
 }
-
-module.exports = Segment;
