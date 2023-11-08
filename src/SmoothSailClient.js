@@ -1,8 +1,7 @@
-import "dotenv/config";
-import EventSource from "eventsource";
-import { Flag } from "./classes/Flag";
+const EventSource = require("eventsource");
+const Flag = require("./classes/Flag");
 
-export class SmoothSailClient {
+class SmoothSailClient {
   constructor(config) {
     this.flagData = {};
     this.config = config;
@@ -84,3 +83,5 @@ export class SmoothSailClient {
     };
   }
 }
+
+module.exports = SmoothSailClient;

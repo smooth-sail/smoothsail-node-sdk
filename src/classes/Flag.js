@@ -1,6 +1,6 @@
-import { Segment } from "./Segment";
+const Segment = require("./Segment");
 
-export class Flag {
+class Flag {
   constructor({ fKey, isActive, segments }) {
     this.fKey = fKey;
     this.isActive = isActive;
@@ -26,3 +26,5 @@ export class Flag {
     );
   }
 }
+
+modules.exports = Flag;
