@@ -1,4 +1,4 @@
-export class Rule {
+class Rule {
   constructor({ rKey, type, operator, value, aKey }) {
     this.rKey = rKey;
     this.type = type;
@@ -38,3 +38,5 @@ export class Rule {
     }
   }
 }
+
+module.exports = Rule;

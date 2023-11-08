@@ -1,7 +1,7 @@
-import { SmoothSailClient } from "./SmoothSailClient";
-import crypto from "crypto";
+const SmoothSailClient = require("./SmoothSailClient");
+const crypto = require("crypto");
 
-export class SmoothSailConfig {
+class SmoothSailConfig {
   constructor(sdkKey, serverAddress) {
     this.sdkKey = this.parseAndEncryptSDK(sdkKey);
     this.serverAddress = serverAddress;
@@ -52,3 +52,5 @@ export class SmoothSailConfig {
     return inputKey.split(":")[0];
   }
 }
+
+module.exports = SmoothSailConfig;
