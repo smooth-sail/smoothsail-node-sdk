@@ -1,3 +1,4 @@
-import { SmoothSailClient } from "./SmoothSailClient";
-import { SmoothSailConfig } from "./SmoothSailConfig";
+const SmoothSailClient = require("./SmoothSailClient");
+const SmoothSailConfig = require("./SmoothSailConfig");
+
 module.exports = { SmoothSailClient, SmoothSailConfig };
