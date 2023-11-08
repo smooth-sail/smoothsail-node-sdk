@@ -1,28 +1,24 @@
 {
-  "name": "dummy-consumer",
+  "name": "smooth-sail-node-sdk",
   "version": "1.0.0",
-  "description": "",
+  "description": "SmoothSail Server-side Node SDK",
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
     "test": "jest --verbose"
   },
   "keywords": [],
-  "author": "",
+  "author": "SmoothSail",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/node": "^7.22.19",
     "@babel/preset-env": "^7.22.20",
-    "jest": "^29.7.0",
-    "nodemon": "^3.0.1"
+    "jest": "^29.7.0"
   },
   "dependencies": {
-    "axios": "^1.5.1",
-    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "eventsource": "^2.0.2",
-    "express": "^4.18.2"
+    "eventsource": "^2.0.2"
   },
   "jest": {
     "testEnvironment": "node"
