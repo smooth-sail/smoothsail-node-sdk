@@ -1,6 +1,6 @@
 {
   "name": "smoothsail-node-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SmoothSail Server-side Node SDK",
   "main": "src/index.js",
   "scripts": {
