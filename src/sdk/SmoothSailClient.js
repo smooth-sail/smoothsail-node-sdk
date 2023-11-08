@@ -7,6 +7,8 @@ export class SmoothSailClient {
     this.flagData = {};
     this.config = config;
     this.SSEconnected = false;
+    this.heartBeatCheck;
+    this.timeDurationCheck = 15000;
   }
 
   setFlags(flags) {
@@ -25,8 +27,24 @@ export class SmoothSailClient {
     }
   }
 
+  resetHeartBeatCheckForConnection(connection) {
+    clearTimeout(this.heartBeatCheck);
+
+    this.heartBeatCheck = setTimeout(() => {
+      console.error(
+        "SmoothSail Server Client: Connection failed. Reopening SSE Connection."
+      );
+      this.resetSSEConnection(connection);
+    }, this.timeDurationCheck);
+  }
+
+  resetSSEConnection(connection) {
+    clearTimeout(this.heartBeatCheck);
+    connection.close();
+    this.openSSEConnection();
+  }
+
   openSSEConnection() {
-    let heartBeatInterval;
     const eventSource = new EventSource(`${this.config.serverAddress}`, {
       headers: {
         Authorization: `${this.config.sdkKey}`,
@@ -34,40 +52,35 @@ export class SmoothSailClient {
     });
 
     eventSource.onopen = () => {
-      console.log(`connection to ${process.env.SSE_ENDPOINT} opened!`);
       this.SSEconnected = true;
-      heartBeatInterval = setTimeout(() => {
-        eventSource.close();
-        this.openSSEConnection();
-      }, 15000);
+      this.resetHeartBeatCheckForConnection(eventSource);
     };
 
     eventSource.onmessage = (e) => {
       const notification = JSON.parse(e.data);
-      console.log(notification);
 
-      if (notification.type === "flags") {
-        this.setFlags(notification);
-      } else if (notification.type === "heartbeat") {
-        clearTimeout(heartBeatInterval);
-        heartBeatInterval = setTimeout(() => {
-          eventSource.close();
-          this.openSSEConnection();
-        }, 15000);
+      switch (notification.type) {
+        case "flags":
+          this.setFlags(notification.payload);
+          break;
+        case "heartbeat":
+          this.resetHeartBeatCheckForConnection(eventSource);
+          break;
       }
     };
 
     eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
+      this.SSEconnected = false;
 
       if (error.status === 401) {
-        console.log("get outta here");
-      } else {
+        console.error("Invalid Credentials. Cannot establish connection.");
         eventSource.close();
-        this.openSSEConnection();
+      } else if (error.status === 404) {
+        console.error("Invalid Server Address. Cannot establish connection.");
+        eventSource.close();
+      } else {
+        console.error("SSE Error: ", error, " Attempting reconnection.");
       }
-
-      this.SSEconnected = false;
     };
   }
 }
