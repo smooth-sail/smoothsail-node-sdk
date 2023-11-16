@@ -20,8 +20,8 @@ export class SmoothSailClient {
 
   evaluateFlag(flagKey, userContext, defaultValue = false) {
     const flag = this.flagData[flagKey];
-    if (this.SSEconnected) {
-      return flag && flag.evaluateFlag(userContext);
+    if (this.SSEconnected && flag) {
+      return flag.evaluateFlag(userContext);
     } else {
       return defaultValue;
     }
