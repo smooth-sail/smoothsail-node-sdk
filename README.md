@@ -12,7 +12,7 @@
 - (string) SDK Key, from SmoothSail's dashboard UI
 - (string) Address of SmoothSail's SDK Service
 
-```
+```javascript
 // shown as hard-coded but recommend having these as environment variables
 
 const config = new SmoothSailConfig("SDK key", "SDK Service address");
@@ -20,7 +20,7 @@ const config = new SmoothSailConfig("SDK key", "SDK Service address");
 
 5. Instantiate a `SmoothSailClient` by calling `config.connect()`. Note that this is an asynchronous action so you will need to use `async/await` to perform this step.
 
-```
+```javascript
 const config = new SmoothSailConfig("SDK key", "bearer address");
 
 let client;
@@ -38,7 +38,7 @@ let client;
 - (object) User Context object
 - (boolean) Default value for flag evaluation, optional argument
 
-```
+```javascript
 let testUserContext = {
   user_name: "John Smith",
   "beta-tester": true,
